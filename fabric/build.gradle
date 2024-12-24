@@ -2,19 +2,7 @@
 //file:noinspection GroovyAssignabilityCheck
 //file:noinspection DependencyNotationArgument
 
-architectury {
-    platformSetupLoomIde()
-    fabric()
-}
-
-loom {
-    accessWidenerPath = project(":common").loom.accessWidenerPath
-}
-
 dependencies {
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
-
     // Fabric Loader
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
@@ -29,4 +17,8 @@ dependencies {
 
     // Distant Horizons
     modRuntimeOnly("blank:DistantHorizons-${rootProject.distant_horizons_version}-${rootProject.minecraft_version}")
+}
+
+loom {
+    accessWidenerPath = project(":common").loom.accessWidenerPath
 }

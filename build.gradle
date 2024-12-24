@@ -2,19 +2,25 @@
 //file:noinspection GroovyAssignabilityCheck
 //file:noinspection DependencyNotationArgument
 
-apply plugin: "architectury-plugin"
+plugins {
+    id "architectury-plugin" version "${architectury_plugin_version}"
+    id "dev.architectury.loom" version "${architectury_loom_version}" apply false
+}
 
 architectury {
     minecraft = rootProject.minecraft_version
 }
 
 subprojects {
+    apply plugin: "architectury-plugin"
     apply plugin: "dev.architectury.loom"
     apply plugin: "com.github.johnrengelman.shadow"
-    apply plugin: "maven-publish"
+
+    version = "${rootProject.mod_version}+mc${rootProject.supported_minecraft_version_name}"
+    group = rootProject.maven_group
 
     base {
-        archivesName = "${rootProject.mod_id}-${project.getName()}"
+        archivesName = "${rootProject.mod_id}-${project.name}"
     }
 
     repositories {
@@ -32,67 +38,31 @@ subprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    }
-
-    processResources {
-        inputs.property "version", project.version
-
-        filesMatching(["fabric.mod.json", "mods.toml"]) {
-            expand "version": project.version,
-                    "mod_id": rootProject.mod_id,
-                    "mod_name": rootProject.mod_name,
-                    "mod_description": rootProject.mod_description,
-                    "mod_license": rootProject.mod_license,
-                    "git_repository_host": rootProject.git_repository_host,
-                    "git_organization": rootProject.git_organization,
-                    "curseforge_project_id": rootProject.curseforge_project_id,
-                    "modrinth_project_id": rootProject.modrinth_project_id,
-                    "supported_minecraft_version": rootProject.supported_minecraft_version,
-                    "fabric_loader_version": rootProject.fabric_loader_version,
-                    "forge_version": rootProject.neoforge_version,
-                    "fabric_api_version": rootProject.fabric_api_version,
-                    "architectury_api_version": rootProject.architectury_api_version
-        }
+        mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
     }
 
     java {
         withSourcesJar()
     }
 
-    jar {
-        from(rootProject.file("LICENSE")) {
-            rename { "${it}_${rootProject.mod_id}" }
+    sourceSets {
+        test {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
         }
     }
 
-    publishing {
-        publications {
-            mavenCommon(MavenPublication) {
-                groupId = rootProject.maven_group
-                artifactId = base.getArchivesName()
-                from components.java
-            }
+    def commonSubProjectPath = ":common"
+    def commonSubProject = project(commonSubProjectPath)
+    if (project.name.contains("common")) {
+        architectury {
+            common(rootProject.enabled_platforms.split(","))
+        }
+    } else {
+        architectury {
+            platformSetupLoomIde()
         }
 
-        repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("${rootProject.maven_repository}/${rootProject.mod_id}")
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
-                }
-            }
-        }
-    }
-
-    // Clean the previous build output of the root project and all subprojects before building
-    tasks.named("build") {
-        dependsOn(clean, subprojects.clean)
-    }
-
-    if (!project.getName().contains("common")) {
         configurations {
             common
             shadowCommon // Don't use shadow from the shadow plugin since it *excludes* files
@@ -101,8 +71,19 @@ subprojects {
             developmentFabric.extendsFrom common
         }
 
+        dependencies {
+            common(project(path: commonSubProjectPath, configuration: "namedElements")) { transitive false }
+        }
+
+        processResources {
+            inputs.property "version", rootProject.version
+
+            from(commonSubProject.sourceSets["main"].resources) {
+                include("assets/**", "data/**", "resourcepacks/**")
+            }
+        }
+
         shadowJar {
-            exclude "fabric.mod.json"
             exclude "architectury.common.json"
 
             configurations = [project.configurations.shadowCommon]
@@ -115,7 +96,7 @@ subprojects {
         }
 
         sourcesJar {
-            def commonSources = project(":common").sourcesJar
+            def commonSources = commonSubProject.sourcesJar
             dependsOn commonSources
             from commonSources.archiveFile.map { zipTree(it) }
         }
@@ -126,16 +107,61 @@ subprojects {
             }
         }
     }
-}
 
-allprojects {
-    apply plugin: "architectury-plugin"
+    if (project.name.contains("forge")) {
+        architectury {
+            forge()
+        }
 
-    version = "${rootProject.mod_version}+mc${rootProject.supported_minecraft_version_name}"
-    group = rootProject.maven_group
+        dependencies {
+            shadowCommon(project(path: commonSubProjectPath, configuration: "transformProductionForge")) { transitive false }
+        }
 
-    tasks.withType(JavaCompile).configureEach {
-        options.encoding = "UTF-8"
-        options.release = "${rootProject.java_version}" as int
+        processResources {
+            filesMatching("mods.toml") {
+                expand "version": project.version,
+                        "mod_id": rootProject.mod_id,
+                        "mod_name": rootProject.mod_name,
+                        "mod_description": rootProject.mod_description,
+                        "mod_license": rootProject.mod_license,
+                        "git_repository_host": rootProject.git_repository_host,
+                        "git_organization": rootProject.git_organization,
+                        "curseforge_project_id": rootProject.curseforge_project_id,
+                        "modrinth_project_id": rootProject.modrinth_project_id,
+                        "supported_minecraft_version": rootProject.supported_minecraft_version,
+                        "forge_version": rootProject.neoforge_version,
+                        "architectury_api_version": rootProject.architectury_api_version
+            }
+        }
+    } else if (project.name.contains("fabric")) {
+        architectury {
+            fabric()
+        }
+
+        dependencies {
+            shadowCommon(project(path: commonSubProjectPath, configuration: "transformProductionFabric")) { transitive false }
+        }
+
+        processResources {
+            filesMatching("fabric.mod.json") {
+                expand "version": project.version,
+                        "mod_id": rootProject.mod_id,
+                        "mod_name": rootProject.mod_name,
+                        "mod_description": rootProject.mod_description,
+                        "mod_license": rootProject.mod_license,
+                        "git_repository_host": rootProject.git_repository_host,
+                        "git_organization": rootProject.git_organization,
+                        "curseforge_project_id": rootProject.curseforge_project_id,
+                        "modrinth_project_id": rootProject.modrinth_project_id,
+                        "supported_minecraft_version": rootProject.supported_minecraft_version,
+                        "fabric_loader_version": rootProject.fabric_loader_version,
+                        "fabric_api_version": rootProject.fabric_api_version,
+                        "architectury_api_version": rootProject.architectury_api_version
+            }
+        }
+
+        shadowJar {
+            exclude "fabric.mod.json"
+        }
     }
 }

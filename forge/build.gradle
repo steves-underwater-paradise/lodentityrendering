@@ -2,11 +2,6 @@
 //file:noinspection GroovyAssignabilityCheck
 //file:noinspection DependencyNotationArgument
 
-architectury {
-    platformSetupLoomIde()
-    forge()
-}
-
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
 
@@ -23,9 +18,6 @@ repositories {
 }
 
 dependencies {
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
-
     // (Neo)Forge
     forge "net.neoforged:forge:${rootProject.minecraft_version}-${rootProject.neoforge_version}"
 
