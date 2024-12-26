@@ -25,5 +25,5 @@ dependencies {
     modRuntimeOnly("dev.architectury:architectury-forge:${rootProject.architectury_api_version}")
 
     // Distant Horizons
-    modRuntimeOnly("blank:DistantHorizons-${rootProject.distant_horizons_version}-${rootProject.minecraft_version}")
+    modRuntimeOnly("blank:DistantHorizons-${rootProject.distant_horizons_version}-${rootProject.minecraft_version}-forge-fabric")
 }

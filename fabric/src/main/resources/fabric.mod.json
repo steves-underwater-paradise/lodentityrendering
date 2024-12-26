@@ -46,6 +46,6 @@
     "minecraft": "${supported_minecraft_version}"
   },
   "recommends": {
-    "distanthorizons": ">=2.1.3-a-dev"
+    "distanthorizons": ">=2.2.1-a-dev"
   }
 }

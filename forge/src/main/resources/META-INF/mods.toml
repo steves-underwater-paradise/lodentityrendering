@@ -37,6 +37,6 @@ side = "BOTH"
 [[dependencies.${mod_id}]]
 modId = "distanthorizons"
 mandatory = true
-versionRange = ">=2.1.3-a-dev"
+versionRange = ">=2.2.1-a-dev"
 ordering = "NONE"
 side = "CLIENT"
