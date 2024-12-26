@@ -9,46 +9,39 @@ import io.github.steveplays28.lodentityrendering.client.util.image.BufferedImage
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceReloader;
+import net.minecraft.resource.SinglePreparationResourceReloader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 @Environment(EnvType.CLIENT)
-public class LODEntityRenderingResourceReloader implements ResourceReloader {
+public class LODEntityRenderingResourceReloader extends SinglePreparationResourceReloader<Void> {
 	private static final @NotNull String JSON_FILE_SUFFIX = ".json";
 	private static final @NotNull String PNG_FILE_SUFFIX = ".png";
 	private static final @NotNull String ENTITY_TEXTURES_FOLDER_NAME = "textures/entity";
 	private static final @NotNull String ENTITY_AVERAGE_COLORS_FOLDER_NAME = "average_colors/entity";
 
 	/**
-	 * Asynchronously process and load resource-based data.
-	 * The code must be thread-safe and not modify game state!
-	 *
-	 * @param synchronizer    The {@link Synchronizer} which should be used for this stage.
-	 * @param resourceManager The {@link ResourceManager} used during reloading.
-	 * @param prepareProfiler The {@link Profiler} which may be used for this stage.
-	 * @param applyProfiler   The {@link Profiler} which may be used for this stage.
-	 * @param prepareExecutor The {@link Executor} which should be used for this stage.
-	 * @param applyExecutor   The {@link Executor} which should be used for this stage.
-	 * @return A {@link CompletableFuture} representing the completed result.
+	 * The preparation stage, ran on worker threads.
 	 */
 	@Override
-	public @NotNull CompletableFuture<Void> reload(@NotNull Synchronizer synchronizer, @NotNull ResourceManager resourceManager, @NotNull Profiler prepareProfiler, @NotNull Profiler applyProfiler, @NotNull Executor prepareExecutor, @NotNull Executor applyExecutor) {
-		return CompletableFuture.supplyAsync(() -> {
-			// TODO: Move into EntityAverageColorRegistry#register using a client-side resource reload event
-			EntityAverageColorRegistry.ENTITY_AVERAGE_COLOR_REGISTRY.clear();
-			loadAndRegisterAverageEntityTextureColorsFromJson(resourceManager);
-			sampleAndRegisterAverageEntityTextureColorsFromEntityTextures(resourceManager);
+	protected @Nullable Void prepare(ResourceManager resourceManager, Profiler profiler) {
+		// NO-OP
+		return null;
+	}
 
-			synchronizer.whenPrepared(null);
-			return null;
-		}, applyExecutor);
+	/**
+	 * The apply stage, ran on the main thread.
+	 */
+	@Override
+	protected void apply(@Nullable Void prepared, ResourceManager resourceManager, Profiler profiler) {
+		EntityAverageColorRegistry.ENTITY_AVERAGE_COLOR_REGISTRY.clear();
+		loadAndRegisterAverageEntityTextureColorsFromJson(resourceManager);
+		sampleAndRegisterAverageEntityTextureColorsFromEntityTextures(resourceManager);
 	}
 
 	private void loadAndRegisterAverageEntityTextureColorsFromJson(@NotNull ResourceManager resourceManager) {
