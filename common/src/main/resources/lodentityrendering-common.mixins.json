@@ -4,6 +4,7 @@
   "package": "io.github.steveplays28.lodentityrendering.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "server.entity.ServerPlayerEntityMixin",
     "server.world.ServerWorldMixin",
     "server.world.ServerWorldMixin$ServerEntityHandlerMixin"
   ],

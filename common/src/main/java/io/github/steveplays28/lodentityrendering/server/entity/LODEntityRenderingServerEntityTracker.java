@@ -7,6 +7,7 @@ import io.github.steveplays28.lodentityrendering.networking.packet.s2c.world.ent
 import io.github.steveplays28.lodentityrendering.server.event.world.entity.LODEntityRenderingServerWorldEntityEvent;
 import io.github.steveplays28.lodentityrendering.networking.packet.s2c.world.entity.LODEntityRenderingS2CEntityLoadPacket;
 import net.minecraft.entity.Entity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,10 @@ public class LODEntityRenderingServerEntityTracker {
 	}
 
 	private static void onEntityLoad(@NotNull ServerWorld serverWorld, @NotNull Entity entity) {
+		if (entity instanceof ServerPlayerEntity serverPlayerEntity && !serverPlayerEntity.isPartOfGame()) {
+			return;
+		}
+
 		@Nullable var entityTextureId = entity.getType().arch$registryName();
 		if (entityTextureId == null) {
 			entityTextureId = FALLBACK_ENTITY_TEXTURE_ID;

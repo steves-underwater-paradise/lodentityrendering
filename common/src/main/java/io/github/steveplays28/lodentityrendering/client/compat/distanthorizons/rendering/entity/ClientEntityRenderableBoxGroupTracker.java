@@ -9,6 +9,7 @@ import io.github.steveplays28.lodentityrendering.client.entity.color.EntityAvera
 import io.github.steveplays28.lodentityrendering.networking.packet.s2c.world.entity.LODEntityRenderingS2CEntityLoadPacket;
 import io.github.steveplays28.lodentityrendering.networking.packet.s2c.world.entity.LODEntityRenderingS2CEntityTickPacket;
 import io.github.steveplays28.lodentityrendering.networking.packet.s2c.world.entity.LODEntityRenderingS2CEntityUnloadPacket;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
@@ -18,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Map;
 
 @Environment(EnvType.CLIENT)
@@ -26,7 +26,7 @@ public class ClientEntityRenderableBoxGroupTracker {
 	/**
 	 * Stores {@link Entity} IDs->{@link IDhApiRenderableBoxGroup}s.
 	 */
-	private static final @NotNull Map<Integer, IDhApiRenderableBoxGroup> RENDERABLE_BOX_GROUPS = new HashMap<>();
+	private static final @NotNull Map<Integer, IDhApiRenderableBoxGroup> RENDERABLE_BOX_GROUPS = new Object2ObjectOpenHashMap<>(50);
 
 	public static void initialize() {
 		NetworkManager.registerReceiver(NetworkManager.Side.S2C, LODEntityRenderingS2CEntityLoadPacket.getId(), (buf, context) -> {
@@ -47,6 +47,12 @@ public class ClientEntityRenderableBoxGroupTracker {
 	}
 
 	private static void startTrackingEntity(int entityId, @NotNull Identifier entityTextureIdentifier, @NotNull Vector3f entityPosition, @NotNull Vector3f entityBoundingBoxMin, @NotNull Vector3f entityBoundingBoxMax) {
+		@Nullable var existingRenderableBoxGroup = RENDERABLE_BOX_GROUPS.get(entityId);
+		if (existingRenderableBoxGroup != null) {
+			existingRenderableBoxGroup.setOriginBlockPos(new DhApiVec3f(entityPosition.x(), entityPosition.y(), entityPosition.z()));
+			return;
+		}
+
 		@Nullable var entityAverageTextureColor = EntityAverageColorRegistry.ENTITY_AVERAGE_COLOR_REGISTRY.get(entityTextureIdentifier);
 		if (entityAverageTextureColor == null) {
 			entityAverageTextureColor = Color.BLACK;
