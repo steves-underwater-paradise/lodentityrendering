@@ -133,6 +133,10 @@ subprojects {
                         "architectury_api_version": rootProject.architectury_api_version
             }
         }
+
+        shadowJar {
+            exclude "fabric.mod.json"
+        }
     } else if (project.name.contains("fabric")) {
         architectury {
             fabric()
@@ -158,10 +162,6 @@ subprojects {
                         "fabric_api_version": rootProject.fabric_api_version,
                         "architectury_api_version": rootProject.architectury_api_version
             }
-        }
-
-        shadowJar {
-            exclude "fabric.mod.json"
         }
     }
 }
