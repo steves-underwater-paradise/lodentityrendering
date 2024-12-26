@@ -9,7 +9,7 @@ Minecraft mod that renders entities in Distant Horizons' LODs.
 ### Required
 
 - [Distant Horizons](https://modrinth.com/mod/distanthorizons)
-  - At least `v2.1.3`
+  - At least `v2.2.1`
 
 ## Compatibility info
 
