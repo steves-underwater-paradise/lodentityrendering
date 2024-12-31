@@ -120,6 +120,7 @@ subprojects {
         processResources {
             filesMatching("META-INF/mods.toml") {
                 expand "version": project.version,
+                        "major_version": project.version.toString().split("\\.")[0],
                         "mod_id": rootProject.mod_id,
                         "mod_name": rootProject.mod_name,
                         "mod_description": rootProject.mod_description,
