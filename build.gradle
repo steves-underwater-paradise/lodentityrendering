@@ -15,6 +15,7 @@ subprojects {
     apply plugin: "architectury-plugin"
     apply plugin: "dev.architectury.loom"
     apply plugin: "com.github.johnrengelman.shadow"
+    apply plugin: "maven-publish"
 
     version = "${rootProject.mod_version}+mc${rootProject.supported_minecraft_version_name}"
     group = rootProject.maven_group
@@ -49,6 +50,27 @@ subprojects {
         test {
             compileClasspath += main.compileClasspath
             runtimeClasspath += main.runtimeClasspath
+        }
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = project.maven_group
+                artifactId = project.archivesBaseName
+                from components.java
+            }
+        }
+
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/steves-underwater-paradise/${rootProject.mod_id}")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
         }
     }
 
