@@ -118,7 +118,7 @@ subprojects {
         }
 
         processResources {
-            filesMatching("mods.toml") {
+            filesMatching("META-INF/mods.toml") {
                 expand "version": project.version,
                         "mod_id": rootProject.mod_id,
                         "mod_name": rootProject.mod_name,
