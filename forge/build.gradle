@@ -8,8 +8,6 @@ loom {
     forge {
         convertAccessWideners = true
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-
-        mixinConfig "${mod_id}-common.mixins.json"
     }
 }
 
@@ -20,6 +18,9 @@ repositories {
 dependencies {
     // (Neo)Forge
     forge "net.neoforged:forge:${rootProject.minecraft_version}-${rootProject.neoforge_version}"
+
+    // Mixin Extras
+    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-forge:${project.mixin_extras_version}")))
 
     // Architectury API
     modRuntimeOnly("dev.architectury:architectury-forge:${rootProject.architectury_api_version}")

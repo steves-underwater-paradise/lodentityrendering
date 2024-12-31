@@ -135,6 +135,12 @@ subprojects {
             forge()
         }
 
+        loom {
+            forge {
+                mixinConfig "${project.mod_id}-common.mixins.json"
+            }
+        }
+
         dependencies {
             shadowCommon(project(path: commonSubProjectPath, configuration: "transformProductionForge")) { transitive false }
         }
