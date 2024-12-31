@@ -12,7 +12,7 @@ description = '''
 ${mod_description}
 '''
 logoFile = "assets/${mod_id}/icon.png"
-displayURL = "https://github.com/steves-underwater-paradise/${mod_id}"
+displayURL = "${git_repository_host}/${git_organization}/${mod_id}"
 acceptableRemoteVersions = "${major_version}.x.x"
 
 [mc-publish]
