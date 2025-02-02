@@ -12,9 +12,10 @@ import org.joml.Vector3f;
 
 public class LODEntityRenderingS2CEntityLoadPacket implements CustomPayload {
 	public static final @NotNull Id<LODEntityRenderingS2CEntityLoadPacket> IDENTIFIER = new Id<>(Identifier.of(LODEntityRendering.MOD_ID, "entity_load_packet"));
-	public static final @NotNull PacketCodec<RegistryByteBuf, LODEntityRenderingS2CEntityLoadPacket> CODEC = PacketCodec.tuple(PacketCodecs.INTEGER, LODEntityRenderingS2CEntityLoadPacket::getEntityId,
-			Identifier.PACKET_CODEC, LODEntityRenderingS2CEntityLoadPacket::getEntityTextureId, PacketCodecs.VECTOR3F, LODEntityRenderingS2CEntityLoadPacket::getEntityPosition, PacketCodecs.VECTOR3F,
-			LODEntityRenderingS2CEntityLoadPacket::getEntityPosition, PacketCodecs.VECTOR3F, LODEntityRenderingS2CEntityLoadPacket::getEntityPosition, LODEntityRenderingS2CEntityLoadPacket::new);
+	public static final @NotNull PacketCodec<RegistryByteBuf, LODEntityRenderingS2CEntityLoadPacket> CODEC =
+			PacketCodec.tuple(PacketCodecs.INTEGER, LODEntityRenderingS2CEntityLoadPacket::getEntityId, Identifier.PACKET_CODEC, LODEntityRenderingS2CEntityLoadPacket::getEntityTextureId,
+					PacketCodecs.VECTOR3F, LODEntityRenderingS2CEntityLoadPacket::getEntityPosition, PacketCodecs.VECTOR3F, LODEntityRenderingS2CEntityLoadPacket::getEntityBoundingBoxMin,
+					PacketCodecs.VECTOR3F, LODEntityRenderingS2CEntityLoadPacket::getEntityBoundingBoxMax, LODEntityRenderingS2CEntityLoadPacket::new);
 
 	private final int entityId;
 	private final @NotNull Identifier entityTextureId;
