@@ -11,5 +11,5 @@ dependencies {
     modRuntimeOnly("dev.architectury:architectury-neoforge:${rootProject.architectury_api_version}")
 
     // Distant Horizons
-    modRuntimeOnly("blank:DistantHorizons-${rootProject.distant_horizons_version}-${rootProject.minecraft_version}-neo-fabric")
+    modRuntimeOnly("blank:DistantHorizons-fabric-neoforge-${rootProject.distant_horizons_version}-${rootProject.minecraft_version}")
 }
