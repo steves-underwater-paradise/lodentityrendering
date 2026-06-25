@@ -54,3 +54,5 @@ Client-side and server-side.
 ## License
 
 This project is licensed under LGPLv3, see [LICENSE](https://github.com/steves-underwater-paradise/lodentityrendering/blob/1.20.1/LICENSE).
+
+Copyright (c) 2023-2026 Steveplays
