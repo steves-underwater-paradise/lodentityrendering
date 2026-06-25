@@ -1,14 +1,18 @@
 package io.github.steveplays28.lodentityrendering.networking.packet.s2c.world.entity;
 
 import io.github.steveplays28.lodentityrendering.LODEntityRendering;
-import io.github.steveplays28.lodentityrendering.networking.packet.LODEntityRenderingPacket;
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class LODEntityRenderingS2CEntityUnloadPacket implements LODEntityRenderingPacket {
-	private static final @NotNull Identifier id = new Identifier(LODEntityRendering.MOD_ID, "entity_unload_packet");
+public class LODEntityRenderingS2CEntityUnloadPacket implements CustomPayload {
+	public static final @NotNull Id<LODEntityRenderingS2CEntityUnloadPacket> IDENTIFIER = new Id<>(Identifier.of(LODEntityRendering.MOD_ID, "entity_unload_packet"));
+	public static final @NotNull PacketCodec<RegistryByteBuf, LODEntityRenderingS2CEntityUnloadPacket> CODEC =
+			PacketCodec.tuple(PacketCodecs.INTEGER, LODEntityRenderingS2CEntityUnloadPacket::getEntityId, LODEntityRenderingS2CEntityUnloadPacket::new);
 
 	private final int entityId;
 
@@ -20,15 +24,9 @@ public class LODEntityRenderingS2CEntityUnloadPacket implements LODEntityRenderi
 		this.entityId = buf.readInt();
 	}
 
-	public static @NotNull Identifier getId() {
-		return id;
-	}
-
 	@Override
-	public @NotNull PacketByteBuf writeBuf() {
-		var buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeInt(entityId);
-		return buf;
+	public @NotNull Id<LODEntityRenderingS2CEntityUnloadPacket> getId() {
+		return IDENTIFIER;
 	}
 
 	public int getEntityId() {

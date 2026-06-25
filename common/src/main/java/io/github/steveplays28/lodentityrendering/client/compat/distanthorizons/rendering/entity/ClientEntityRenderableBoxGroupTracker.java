@@ -36,24 +36,18 @@ public class ClientEntityRenderableBoxGroupTracker {
 	private static final @NotNull Map<Integer, IDhApiRenderableBoxGroup> RENDERABLE_BOX_GROUPS = new Object2ObjectOpenHashMap<>(50);
 
 	public static void initialize() {
-		NetworkManager.registerReceiver(NetworkManager.Side.S2C, LODEntityRenderingS2CEntityLoadPacket.getId(), (buf, context) -> {
-			var entityLoadPacket = new LODEntityRenderingS2CEntityLoadPacket(buf);
-			startTrackingEntity(
-					entityLoadPacket.getEntityId(), entityLoadPacket.getEntityTextureId(), entityLoadPacket.getEntityPosition(),
-					entityLoadPacket.getEntityBoundingBoxMin(), entityLoadPacket.getEntityBoundingBoxMax()
-			);
+		NetworkManager.registerReceiver(NetworkManager.Side.S2C, LODEntityRenderingS2CEntityLoadPacket.IDENTIFIER, LODEntityRenderingS2CEntityLoadPacket.CODEC, (packet, context) -> {
+			startTrackingEntity(packet.getEntityId(), packet.getEntityTextureId(), packet.getEntityPosition(), packet.getEntityBoundingBoxMin(), packet.getEntityBoundingBoxMax());
 		});
-		NetworkManager.registerReceiver(
-				NetworkManager.Side.S2C, LODEntityRenderingS2CEntityUnloadPacket.getId(),
-				(buf, context) -> stopTrackingEntity(new LODEntityRenderingS2CEntityUnloadPacket(buf).getEntityId())
-		);
-		NetworkManager.registerReceiver(NetworkManager.Side.S2C, LODEntityRenderingS2CEntityTickPacket.getId(), (buf, context) -> {
-			var entityTickPacket = new LODEntityRenderingS2CEntityTickPacket(buf);
-			updateTrackingEntityPosition(entityTickPacket.getEntityId(), entityTickPacket.getEntityPosition());
+		NetworkManager.registerReceiver(NetworkManager.Side.S2C, LODEntityRenderingS2CEntityUnloadPacket.IDENTIFIER, LODEntityRenderingS2CEntityUnloadPacket.CODEC,
+				(packet, context) -> stopTrackingEntity(packet.getEntityId()));
+		NetworkManager.registerReceiver(NetworkManager.Side.S2C, LODEntityRenderingS2CEntityTickPacket.IDENTIFIER, LODEntityRenderingS2CEntityTickPacket.CODEC, (packet, context) -> {
+			updateTrackingEntityPosition(packet.getEntityId(), packet.getEntityPosition());
 		});
 	}
 
-	private static void startTrackingEntity(int entityId, @NotNull Identifier entityTextureIdentifier, @NotNull Vector3f entityPosition, @NotNull Vector3f entityBoundingBoxMin, @NotNull Vector3f entityBoundingBoxMax) {
+	private static void startTrackingEntity(int entityId, @NotNull Identifier entityTextureIdentifier, @NotNull Vector3f entityPosition, @NotNull Vector3f entityBoundingBoxMin,
+			@NotNull Vector3f entityBoundingBoxMax) {
 		@Nullable var existingRenderableBoxGroup = RENDERABLE_BOX_GROUPS.get(entityId);
 		if (existingRenderableBoxGroup != null) {
 			existingRenderableBoxGroup.setOriginBlockPos(new DhApiVec3d(entityPosition.x(), entityPosition.y(), entityPosition.z()));
@@ -66,16 +60,9 @@ public class ClientEntityRenderableBoxGroupTracker {
 		}
 
 		@NotNull final var renderableBoxGroup = DhApi.Delayed.customRenderObjectFactory.createForSingleBox(
-				String.format(
-						"%s/%s/%s", RENDERABLE_BOX_GROUP_IDENTIFIER_PREFIX, entityTextureIdentifier.getNamespace(),
-						entityTextureIdentifier.getPath()
-				),
-				new DhApiRenderableBox(
-						new DhApiVec3d(entityBoundingBoxMin.x(), entityBoundingBoxMin.y(), entityBoundingBoxMin.z()),
-						new DhApiVec3d(entityBoundingBoxMax.x(), entityBoundingBoxMax.y(), entityBoundingBoxMax.z()),
-						entityAverageTextureColor, EDhApiBlockMaterial.UNKNOWN
-				)
-		);
+				String.format("%s/%s/%s", RENDERABLE_BOX_GROUP_IDENTIFIER_PREFIX, entityTextureIdentifier.getNamespace(), entityTextureIdentifier.getPath()),
+				new DhApiRenderableBox(new DhApiVec3d(entityBoundingBoxMin.x(), entityBoundingBoxMin.y(), entityBoundingBoxMin.z()),
+						new DhApiVec3d(entityBoundingBoxMax.x(), entityBoundingBoxMax.y(), entityBoundingBoxMax.z()), entityAverageTextureColor, EDhApiBlockMaterial.UNKNOWN));
 		renderableBoxGroup.setOriginBlockPos(new DhApiVec3d(entityPosition.x(), entityPosition.y(), entityPosition.z()));
 		RENDERABLE_BOX_GROUPS.put(entityId, renderableBoxGroup);
 

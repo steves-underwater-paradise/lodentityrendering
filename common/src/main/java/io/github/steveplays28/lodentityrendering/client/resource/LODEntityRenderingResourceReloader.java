@@ -50,7 +50,7 @@ public class LODEntityRenderingResourceReloader extends SinglePreparationResourc
 		for (@NotNull final var averageEntityTextureColorJsonFilePath : averageEntityTextureColorJsonFiles.keySet()) {
 			@NotNull final var entityTexturePathSplit = averageEntityTextureColorJsonFilePath.getPath().replace(JSON_FILE_SUFFIX, "").split(
 					"/");
-			@NotNull final var entityIdentifier = new Identifier(
+			@NotNull final var entityIdentifier = Identifier.of(
 					averageEntityTextureColorJsonFilePath.getNamespace(), entityTexturePathSplit[entityTexturePathSplit.length - 1]
 			);
 			if (EntityAverageColorRegistry.ENTITY_AVERAGE_COLOR_REGISTRY.containsKey(entityIdentifier)) {
@@ -83,7 +83,7 @@ public class LODEntityRenderingResourceReloader extends SinglePreparationResourc
 				entityName = entityTexturePathSplit[entityTexturePathSplit.length - 1];
 			}
 
-			@NotNull final var entityIdentifier = new Identifier(
+			@NotNull final var entityIdentifier = Identifier.of(
 					entityTexturePath.getNamespace(), entityName
 			);
 			if (EntityAverageColorRegistry.ENTITY_AVERAGE_COLOR_REGISTRY.containsKey(entityIdentifier)) {

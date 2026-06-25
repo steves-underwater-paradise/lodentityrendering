@@ -1,14 +1,14 @@
-package io.github.steveplays28.lodentityrendering.forge;
+package io.github.steveplays28.lodentityrendering.neoforge;
 
 import io.github.steveplays28.lodentityrendering.LODEntityRendering;
 import io.github.steveplays28.lodentityrendering.client.LODEntityRenderingClient;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 @Mod(LODEntityRendering.MOD_ID)
-public class LODEntityRenderingForge {
-	public LODEntityRenderingForge() {
+public class LODEntityRenderingNeoForge {
+	public LODEntityRenderingNeoForge() {
 		if (FMLEnvironment.dist == Dist.CLIENT) {
 			LODEntityRenderingClient.initialize();
 		}

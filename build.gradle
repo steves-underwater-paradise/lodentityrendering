@@ -12,6 +12,11 @@ architectury {
 }
 
 subprojects {
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+        options.release = "${rootProject.java_version}" as int
+    }
+
     apply plugin: "architectury-plugin"
     apply plugin: "dev.architectury.loom"
     apply plugin: "com.github.johnrengelman.shadow"
@@ -39,7 +44,10 @@ subprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
+        mappings loom.layered {
+            it.mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
+            it.mappings("dev.architectury:yarn-mappings-patch-neoforge:1.21+build.4")
+        }
     }
 
     java {
@@ -130,23 +138,24 @@ subprojects {
         }
     }
 
-    if (project.name.contains("forge")) {
+    if (project.name.contains("neoforge")) {
         architectury {
-            forge()
+            neoForge()
         }
 
-        loom {
-            forge {
-                mixinConfig "${project.mod_id}-common.mixins.json"
-            }
+        repositories {
+            maven { url "https://maven.neoforged.net/releases/" }
         }
 
         dependencies {
-            shadowCommon(project(path: commonSubProjectPath, configuration: "transformProductionForge")) { transitive false }
+            // NeoForge
+            neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
+
+            shadowCommon(project(path: commonSubProjectPath, configuration: "transformProductionNeoForge")) { transitive false }
         }
 
         processResources {
-            filesMatching("META-INF/mods.toml") {
+            filesMatching("META-INF/neoforge.mods.toml") {
                 expand "version": project.version,
                         "major_version": project.version.toString().split("\\.")[0],
                         "mod_id": rootProject.mod_id,
@@ -158,7 +167,7 @@ subprojects {
                         "curseforge_project_id": rootProject.curseforge_project_id,
                         "modrinth_project_id": rootProject.modrinth_project_id,
                         "supported_minecraft_version": rootProject.supported_minecraft_version,
-                        "forge_version": rootProject.neoforge_version,
+                        "neoforge_version": rootProject.neoforge_version,
                         "architectury_api_version": rootProject.architectury_api_version
             }
         }

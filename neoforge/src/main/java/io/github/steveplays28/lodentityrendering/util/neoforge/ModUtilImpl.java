@@ -1,7 +1,7 @@
-package io.github.steveplays28.lodentityrendering.util.forge;
+package io.github.steveplays28.lodentityrendering.util.neoforge;
 
 import io.github.steveplays28.lodentityrendering.util.ModUtil;
-import net.minecraftforge.fml.loading.LoadingModList;
+import net.neoforged.fml.loading.LoadingModList;
 
 /**
  * Implements {@link ModUtil}.

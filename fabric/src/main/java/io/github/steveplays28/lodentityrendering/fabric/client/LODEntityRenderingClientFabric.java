@@ -24,7 +24,7 @@ public class LODEntityRenderingClientFabric implements ClientModInitializer {
 
 		// Register a built-in default resource pack
 		ResourceManagerHelper.registerBuiltinResourcePack(
-				new Identifier(MOD_ID, BUILT_IN_RESOURCE_PACK_ID), modContainer.get(), ResourcePackActivationType.DEFAULT_ENABLED);
+				Identifier.of(MOD_ID, BUILT_IN_RESOURCE_PACK_ID), modContainer.get(), ResourcePackActivationType.DEFAULT_ENABLED);
 		LODEntityRenderingClient.initialize();
 	}
 }

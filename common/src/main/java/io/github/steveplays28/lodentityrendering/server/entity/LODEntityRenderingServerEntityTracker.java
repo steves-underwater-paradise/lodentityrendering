@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 public class LODEntityRenderingServerEntityTracker {
-	private static final @NotNull Identifier FALLBACK_ENTITY_TEXTURE_ID = new Identifier(LODEntityRendering.MOD_ID, "fallback_entity_texture_id");
+	private static final @NotNull Identifier FALLBACK_ENTITY_TEXTURE_ID = Identifier.of(LODEntityRendering.MOD_ID, "fallback_entity_texture_id");
 
 	static {
 		LODEntityRenderingServerWorldEntityEvent.ENTITY_LOAD.register(LODEntityRenderingServerEntityTracker::onEntityLoad);
@@ -38,33 +38,17 @@ public class LODEntityRenderingServerEntityTracker {
 		final var entityPositionY = entityPosition.y();
 		final var entityPositionZ = entityPosition.z();
 		@NotNull final var entityBoundingBox = entity.getBoundingBox();
-		NetworkManager.sendToPlayers(
-				serverWorld.getPlayers(), LODEntityRenderingS2CEntityLoadPacket.getId(),
-				new LODEntityRenderingS2CEntityLoadPacket(
-						entity.getId(), entityTextureId, entity.getPos().toVector3f(),
-						new Vector3f(
-								(float) entityBoundingBox.minX - entityPositionX,
-								(float) entityBoundingBox.minY - entityPositionY,
-								(float) entityBoundingBox.minZ - entityPositionZ
-						),
-						new Vector3f(
-								(float) entityBoundingBox.maxX - entityPositionX,
-								(float) entityBoundingBox.maxY - entityPositionY,
-								(float) entityBoundingBox.maxZ - entityPositionZ
-						)
-				).writeBuf()
-		);
+		NetworkManager.sendToPlayers(serverWorld.getPlayers(),
+				new LODEntityRenderingS2CEntityLoadPacket(entity.getId(), entityTextureId, entity.getPos().toVector3f(),
+						new Vector3f((float) entityBoundingBox.minX - entityPositionX, (float) entityBoundingBox.minY - entityPositionY, (float) entityBoundingBox.minZ - entityPositionZ),
+						new Vector3f((float) entityBoundingBox.maxX - entityPositionX, (float) entityBoundingBox.maxY - entityPositionY, (float) entityBoundingBox.maxZ - entityPositionZ)));
 	}
 
 	private static void onEntityUnload(@NotNull ServerWorld serverWorld, @NotNull Entity entity) {
-		NetworkManager.sendToPlayers(
-				serverWorld.getPlayers(), LODEntityRenderingS2CEntityUnloadPacket.getId(), new LODEntityRenderingS2CEntityUnloadPacket(entity.getId()).writeBuf());
+		NetworkManager.sendToPlayers(serverWorld.getPlayers(), new LODEntityRenderingS2CEntityUnloadPacket(entity.getId()));
 	}
 
 	private static void onEntityTick(@NotNull ServerWorld serverWorld, @NotNull Entity entity) {
-		NetworkManager.sendToPlayers(
-				serverWorld.getPlayers(), LODEntityRenderingS2CEntityTickPacket.getId(),
-				new LODEntityRenderingS2CEntityTickPacket(entity.getId(), entity.getPos().toVector3f()).writeBuf()
-		);
+		NetworkManager.sendToPlayers(serverWorld.getPlayers(), new LODEntityRenderingS2CEntityTickPacket(entity.getId(), entity.getPos().toVector3f()));
 	}
 }

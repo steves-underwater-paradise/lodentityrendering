@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = ">=${forge_version}"
+loaderVersion = ">=${neoforge_version}"
 license = "${mod_license}"
 issueTrackerURL = "${git_repository_host}/${git_organization}/${mod_id}/issues"
 
@@ -15,8 +15,10 @@ logoFile = "assets/${mod_id}/icon.png"
 displayURL = "${git_repository_host}/${git_organization}/${mod_id}"
 acceptableRemoteVersions = "${major_version}.x.x"
 
+[[mixins]]
+config = "${mod_id}-common.mixins.json"
+
 [mc-publish]
-loaders = ["forge", "neoforge"]
 curseforge = "${curseforge_project_id}"
 modrinth = "${modrinth_project_id}"
 
@@ -28,9 +30,9 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.${mod_id}]]
-modId = "forge"
+modId = "neoforge"
 mandatory = true
-versionRange = ">=${forge_version}"
+versionRange = ">=${neoforge_version}"
 ordering = "NONE"
 side = "BOTH"
 

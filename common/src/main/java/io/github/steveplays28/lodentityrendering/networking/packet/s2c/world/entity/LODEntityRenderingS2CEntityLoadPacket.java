@@ -1,15 +1,20 @@
 package io.github.steveplays28.lodentityrendering.networking.packet.s2c.world.entity;
 
 import io.github.steveplays28.lodentityrendering.LODEntityRendering;
-import io.github.steveplays28.lodentityrendering.networking.packet.LODEntityRenderingPacket;
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-public class LODEntityRenderingS2CEntityLoadPacket implements LODEntityRenderingPacket {
-	private static final @NotNull Identifier id = new Identifier(LODEntityRendering.MOD_ID, "entity_load_packet");
+public class LODEntityRenderingS2CEntityLoadPacket implements CustomPayload {
+	public static final @NotNull Id<LODEntityRenderingS2CEntityLoadPacket> IDENTIFIER = new Id<>(Identifier.of(LODEntityRendering.MOD_ID, "entity_load_packet"));
+	public static final @NotNull PacketCodec<RegistryByteBuf, LODEntityRenderingS2CEntityLoadPacket> CODEC = PacketCodec.tuple(PacketCodecs.INTEGER, LODEntityRenderingS2CEntityLoadPacket::getEntityId,
+			Identifier.PACKET_CODEC, LODEntityRenderingS2CEntityLoadPacket::getEntityTextureId, PacketCodecs.VECTOR3F, LODEntityRenderingS2CEntityLoadPacket::getEntityPosition, PacketCodecs.VECTOR3F,
+			LODEntityRenderingS2CEntityLoadPacket::getEntityPosition, PacketCodecs.VECTOR3F, LODEntityRenderingS2CEntityLoadPacket::getEntityPosition, LODEntityRenderingS2CEntityLoadPacket::new);
 
 	private final int entityId;
 	private final @NotNull Identifier entityTextureId;
@@ -17,7 +22,8 @@ public class LODEntityRenderingS2CEntityLoadPacket implements LODEntityRendering
 	private final @NotNull Vector3f entityBoundingBoxMin;
 	private final @NotNull Vector3f entityBoundingBoxMax;
 
-	public LODEntityRenderingS2CEntityLoadPacket(int entityId, @NotNull Identifier entityTextureId, @NotNull Vector3f entityPosition, @NotNull Vector3f entityBoundingBoxMin, @NotNull Vector3f entityBoundingBoxMax) {
+	public LODEntityRenderingS2CEntityLoadPacket(int entityId, @NotNull Identifier entityTextureId, @NotNull Vector3f entityPosition, @NotNull Vector3f entityBoundingBoxMin,
+			@NotNull Vector3f entityBoundingBoxMax) {
 		this.entityId = entityId;
 		this.entityTextureId = entityTextureId;
 		this.entityPosition = entityPosition;
@@ -33,19 +39,9 @@ public class LODEntityRenderingS2CEntityLoadPacket implements LODEntityRendering
 		this.entityBoundingBoxMax = buf.readVector3f();
 	}
 
-	public static @NotNull Identifier getId() {
-		return id;
-	}
-
 	@Override
-	public @NotNull PacketByteBuf writeBuf() {
-		var buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeInt(entityId);
-		buf.writeIdentifier(entityTextureId);
-		buf.writeVector3f(entityPosition);
-		buf.writeVector3f(entityBoundingBoxMin);
-		buf.writeVector3f(entityBoundingBoxMax);
-		return buf;
+	public @NotNull Id<LODEntityRenderingS2CEntityLoadPacket> getId() {
+		return IDENTIFIER;
 	}
 
 	public int getEntityId() {
